@@ -3,6 +3,11 @@ package response
 // DefaultCode 基本类型错误码
 const DefaultCode = 1001
 
+// type CodeError interface {
+// 	Error() string
+// 	Data() *CodeErrorResponse
+// }
+
 // DefaultCodeError 基本类型错误结构体
 type DefaultCodeError struct {
 	Code int    `json:"code"`
