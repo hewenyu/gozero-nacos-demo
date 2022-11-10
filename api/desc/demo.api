@@ -1,0 +1,11 @@
+syntax = "v1"
+
+info(
+	title: "文件信息"
+	desc: "文件信息"
+	author: "hewenyu"
+	email: "yuebanlaosiji@outlook.com"
+	version: "v1"
+)
+
+import "base.api"

@@ -1,0 +1,20 @@
+syntax = "v1"
+
+info(
+	title: "测试demo"
+	desc: "测试demo"
+	author: "hewenyu"
+	email: "yuebanlaosiji@outlook.com"
+	version: "v1"
+)
+
+// PingResponse 测试请求返回结构体
+type PingResponse {
+	Code int `json:"code"`
+}
+
+service demo-api {
+	@doc "退出登录"
+	@handler PingHandler
+	get /user/ping returns (PingResponse)
+}

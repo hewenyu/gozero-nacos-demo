@@ -4,6 +4,21 @@ go zero 使用nacos 2.x作为注册中心和配置中心 demo
 
 
 
+## API 文件
+
+
+```bash
+# 使用命令生成api的代码
+goctl api go -api ./api/desc/demo.api -dir ./api
+```
+
+
+```bash
+# 进入到api的目录
+cd api
+# 使用命令生成api的代码
+goctl api plugin -plugin goctl-swagger="swagger -filename casbin.json" -api ./desc/casbin.api -dir .
+```
 
 ## pb 文件
 
