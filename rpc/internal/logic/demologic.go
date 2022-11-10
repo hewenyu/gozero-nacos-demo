@@ -25,7 +25,7 @@ func NewDemoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *DemoLogic {
 	}
 }
 
-// NewDemoLogic 初始化
+// Demo 初始化
 func (l *DemoLogic) Demo(in *pb.DemoRequest) (*pb.DemoResponse, error) {
 
 	return &pb.DemoResponse{
