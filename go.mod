@@ -3,14 +3,13 @@ module github.com/hewenyu/gozero-nacos-demo
 go 1.17
 
 require (
-	git-devops.zeekrlife.com/dr/response v0.1.1
 	github.com/zeromicro/go-zero v1.4.2
+	go.opentelemetry.io/otel/trace v1.11.0
 	google.golang.org/grpc v1.50.1
 	google.golang.org/protobuf v1.28.1
 )
 
 require (
-	git-devops.zeekrlife.com/dr/errorx v0.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
@@ -54,7 +53,6 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.11.0 // indirect
 	go.opentelemetry.io/otel/exporters/zipkin v1.11.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.11.0 // indirect
-	go.opentelemetry.io/otel/trace v1.11.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.19.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/automaxprocs v1.5.1 // indirect
