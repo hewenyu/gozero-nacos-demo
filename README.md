@@ -17,7 +17,7 @@ goctl api go -api ./api/desc/demo.api -dir ./api
 # 进入到api的目录
 cd api
 # 使用命令生成api的代码
-goctl api plugin -plugin goctl-swagger="swagger -filename casbin.json" -api ./desc/casbin.api -dir .
+goctl api plugin -plugin goctl-swagger="swagger -filename demo.json" -api ./api/desc/demo.api -dir .
 ```
 
 ## pb 文件

@@ -40,7 +40,6 @@ func Response(ctx context.Context, w http.ResponseWriter, resp interface{}, err 
 		return
 	}
 
-	// if errors.As(err, target interface{})
 	switch e := err.(type) {
 	case *DefaultCodeError:
 		body.Code = e.Code
