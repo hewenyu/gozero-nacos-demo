@@ -14,3 +14,5 @@
 *.log
 
 rpc/etc/demo.yaml
+
+**/.vscode
