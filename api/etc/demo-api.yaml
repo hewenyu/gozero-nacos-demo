@@ -1,3 +1,11 @@
-Name: demo-api
-Host: 0.0.0.0
-Port: 8888
+Addr: test.nacos.com
+Port: 8848
+GrpcPort: 9848
+Group: test_group
+DataID: test_data
+ExtDataIDs:
+  - mysql
+  - auth
+NamespaceID: 11111111-1111-1111-1111-111111111111
+Username: test
+Password: test
