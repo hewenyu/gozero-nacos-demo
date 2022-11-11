@@ -1,8 +1,6 @@
 package main
 
 import (
-	_ "github.com/hewenyu/zero-contrib/zrpc/registry/nacos"
-
 	"flag"
 	"fmt"
 
@@ -10,6 +8,7 @@ import (
 	"github.com/hewenyu/gozero-nacos-demo/api/internal/handler"
 	"github.com/hewenyu/gozero-nacos-demo/api/internal/svc"
 	"github.com/hewenyu/gozero-nacos-demo/common"
+	_ "github.com/hewenyu/zero-contrib/zrpc/registry/nacos"
 	"github.com/zeromicro/go-zero/rest"
 )
 
