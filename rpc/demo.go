@@ -23,7 +23,7 @@ func main() {
 
 	var c config.Config
 	// conf.MustLoad(*configFile, &c)
-
+	// 加载配置并注册到nacos
 	common.MustRegister(common.MustLoad(*configFile, &c), &c.RpcServerConf)
 	ctx := svc.NewServiceContext(&c)
 

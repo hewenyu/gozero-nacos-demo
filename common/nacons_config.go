@@ -30,8 +30,7 @@ type Nacos struct {
 	NamespaceID string
 	Username    string
 	Password    string
-	// ExtDataIDs  []string `json:",optional"`
-
+	ExtDataIDs  []string `json:",optional"`
 }
 
 // InitConfigClient 初始化客户端
@@ -70,45 +69,49 @@ func (conf *Nacos) InitConfigClient() (err error) {
 
 // GetConfig 获取配置文件
 func (conf *Nacos) GetConfig() (string, error) {
-	// var configMap = make(map[interface{}]interface{})
+
 	mainConfig, err := configClient.GetConfig(vo.ConfigParam{DataId: conf.DataID, Group: conf.Group})
 	if err != nil {
 		return "", err
 	}
 	logx.Debug(mainConfig)
-	return mainConfig, nil
+	// return mainConfig, nil
 
-	// ExtDataIDs 如果需要的话就使用
+	if len(conf.ExtDataIDs) == 0 {
+		return mainConfig, nil
+	}
 
-	// mainMap, err := UnmarshalYamlToMap(mainConfig)
-	// if err != nil {
-	// 	return "", err
-	// }
+	var configMap = make(map[interface{}]interface{})
 
-	// var extMap = make(map[interface{}]interface{})
-	// for _, dataID := range conf.ExtDataIDs {
-	// 	extConfig, errMsg := configClient.GetConfig(vo.ConfigParam{DataId: dataID, Group: conf.Group})
-	// 	if err != nil {
-	// 		return "", errMsg
-	// 	}
+	mainMap, err := UnmarshalYamlToMap(mainConfig)
+	if err != nil {
+		return "", err
+	}
 
-	// 	tmpExtMap, errMsg := UnmarshalYamlToMap(extConfig)
-	// 	if err != nil {
-	// 		return "", errMsg
-	// 	}
+	var extMap = make(map[interface{}]interface{})
+	for k := range conf.ExtDataIDs {
+		extConfig, errMsg := configClient.GetConfig(vo.ConfigParam{DataId: conf.ExtDataIDs[k], Group: conf.Group})
+		if err != nil {
+			return "", errMsg
+		}
 
-	// 	extMap = MergeMap(extMap, tmpExtMap)
-	// }
+		tmpExtMap, errMsg := UnmarshalYamlToMap(extConfig)
+		if err != nil {
+			return "", errMsg
+		}
 
-	// configMap = MergeMap(configMap, extMap)
-	// configMap = MergeMap(configMap, mainMap)
+		extMap = MergeMap(extMap, tmpExtMap)
+	}
 
-	// yamlString, err := MarshalObjectToYamlString(configMap)
-	// if err != nil {
-	// 	return "", err
-	// }
+	configMap = MergeMap(configMap, extMap)
+	configMap = MergeMap(configMap, mainMap)
 
-	// return yamlString, nil
+	yamlString, err := MarshalObjectToYamlString(configMap)
+	if err != nil {
+		return "", err
+	}
+
+	return yamlString, nil
 }
 
 // Listen 监听
