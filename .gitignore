@@ -12,3 +12,5 @@
 *.out
 
 *.log
+
+rpc/etc/demo.yaml
