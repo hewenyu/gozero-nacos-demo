@@ -11,7 +11,6 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	zeroConf "github.com/zeromicro/go-zero/core/conf"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/zrpc"
 )
 
@@ -74,7 +73,7 @@ func (conf *Nacos) GetConfig() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	logx.Debug(mainConfig)
+	// logx.Debug(mainConfig)
 	// return mainConfig, nil
 
 	if len(conf.ExtDataIDs) == 0 {
@@ -125,7 +124,7 @@ func (conf *Nacos) Listen(onChange func(string, string, string, string)) error {
 
 // NewZrpcClient RPC client
 func (conf *Nacos) NewZrpcClient(serverName, clientName string) zrpc.Client {
-	var target = fmt.Sprintf("nacos://%s:%d/%s?timeout=%s&namespace_id=%s&group_name=%s&app_name=%s", conf.Addr, conf.Port, serverName, "3s", conf.NamespaceID, conf.Group, clientName)
+	var target = fmt.Sprintf("nacos://%s:%s@%s:%d/%s?timeout=%s&namespace_id=%s&group_name=%s&app_name=%s&grpc=%d", conf.Username, conf.Password, conf.Addr, conf.Port, serverName, "10s", conf.NamespaceID, conf.Group, clientName, conf.GrpcPort)
 	return zrpc.MustNewClient(zrpc.RpcClientConf{
 		Target: target,
 	})
