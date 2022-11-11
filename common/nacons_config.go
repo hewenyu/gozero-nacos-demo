@@ -11,6 +11,7 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	zeroConf "github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/zrpc"
 )
 
@@ -23,64 +24,91 @@ var (
 type Nacos struct {
 	Addr        string
 	Port        uint64
+	GrpcPort    uint64
 	Group       string
 	DataID      string
-	ExtDataIDs  []string `json:",optional"`
 	NamespaceID string
+	Username    string
+	Password    string
+	// ExtDataIDs  []string `json:",optional"`
+
 }
 
 // InitConfigClient 初始化客户端
 func (conf *Nacos) InitConfigClient() (err error) {
 	nacosOnce.Do(func() {
+
+		sc := []constant.ServerConfig{
+			*constant.NewServerConfig(conf.Addr, conf.Port, constant.WithContextPath("/nacos"), constant.WithGrpcPort(conf.GrpcPort)),
+		}
+
+		// create ClientConfig
+		cc := *constant.NewClientConfig(
+			constant.WithNamespaceId(conf.NamespaceID),
+			constant.WithTimeoutMs(5000),
+			constant.WithNotLoadCacheAtStart(true),
+			constant.WithLogDir("/tmp/nacos/log"),
+			constant.WithCacheDir("/tmp/nacos/cache"),
+			constant.WithUsername(conf.Username),
+			constant.WithPassword(conf.Password),
+			constant.WithLogLevel("info"),
+			// constant.WithLogLevel("debug"),
+		)
+
 		configClient, err = clients.NewConfigClient(
 			vo.NacosClientParam{
-				ClientConfig: &constant.ClientConfig{TimeoutMs: 5000, NamespaceId: conf.NamespaceID},
-				ServerConfigs: []constant.ServerConfig{
-					{IpAddr: conf.Addr, Port: conf.Port},
-				},
+				ClientConfig:  &cc,
+				ServerConfigs: sc,
 			},
 		)
+		if err != nil {
+			panic(err)
+		}
 	})
 	return
 }
 
 // GetConfig 获取配置文件
 func (conf *Nacos) GetConfig() (string, error) {
-	var configMap = make(map[interface{}]interface{})
+	// var configMap = make(map[interface{}]interface{})
 	mainConfig, err := configClient.GetConfig(vo.ConfigParam{DataId: conf.DataID, Group: conf.Group})
 	if err != nil {
 		return "", err
 	}
+	logx.Debug(mainConfig)
+	return mainConfig, nil
 
-	mainMap, err := UnmarshalYamlToMap(mainConfig)
-	if err != nil {
-		return "", err
-	}
+	// ExtDataIDs 如果需要的话就使用
 
-	var extMap = make(map[interface{}]interface{})
-	for _, dataID := range conf.ExtDataIDs {
-		extConfig, errMsg := configClient.GetConfig(vo.ConfigParam{DataId: dataID, Group: conf.Group})
-		if err != nil {
-			return "", errMsg
-		}
+	// mainMap, err := UnmarshalYamlToMap(mainConfig)
+	// if err != nil {
+	// 	return "", err
+	// }
 
-		tmpExtMap, errMsg := UnmarshalYamlToMap(extConfig)
-		if err != nil {
-			return "", errMsg
-		}
+	// var extMap = make(map[interface{}]interface{})
+	// for _, dataID := range conf.ExtDataIDs {
+	// 	extConfig, errMsg := configClient.GetConfig(vo.ConfigParam{DataId: dataID, Group: conf.Group})
+	// 	if err != nil {
+	// 		return "", errMsg
+	// 	}
 
-		extMap = MergeMap(extMap, tmpExtMap)
-	}
+	// 	tmpExtMap, errMsg := UnmarshalYamlToMap(extConfig)
+	// 	if err != nil {
+	// 		return "", errMsg
+	// 	}
 
-	configMap = MergeMap(configMap, extMap)
-	configMap = MergeMap(configMap, mainMap)
+	// 	extMap = MergeMap(extMap, tmpExtMap)
+	// }
 
-	yamlString, err := MarshalObjectToYamlString(configMap)
-	if err != nil {
-		return "", err
-	}
+	// configMap = MergeMap(configMap, extMap)
+	// configMap = MergeMap(configMap, mainMap)
 
-	return yamlString, nil
+	// yamlString, err := MarshalObjectToYamlString(configMap)
+	// if err != nil {
+	// 	return "", err
+	// }
+
+	// return yamlString, nil
 }
 
 // Listen 监听
@@ -128,18 +156,24 @@ func MustLoad(nacosConfigFilePath string, v interface{}) *Nacos {
 
 // MustRegister 注册
 func MustRegister(nacosConfig *Nacos, rpcConfig *zrpc.RpcServerConf) {
+
 	sc := []constant.ServerConfig{
-		*constant.NewServerConfig(nacosConfig.Addr, nacosConfig.Port),
+		*constant.NewServerConfig(nacosConfig.Addr, nacosConfig.Port, constant.WithContextPath("/nacos"), constant.WithGrpcPort(nacosConfig.GrpcPort)),
 	}
 
-	cc := &constant.ClientConfig{
-		NamespaceId:         nacosConfig.NamespaceID, // namespace id
-		TimeoutMs:           5000,
-		NotLoadCacheAtStart: true,
-		LogLevel:            "info",
-	}
+	// create ClientConfig
+	cc := *constant.NewClientConfig(
+		constant.WithNamespaceId(nacosConfig.NamespaceID),
+		constant.WithTimeoutMs(5000),
+		constant.WithNotLoadCacheAtStart(true),
+		constant.WithLogDir("/tmp/nacos/log"),
+		constant.WithCacheDir("/tmp/nacos/cache"),
+		constant.WithUsername(nacosConfig.Username),
+		constant.WithPassword(nacosConfig.Password),
+		constant.WithLogLevel("info"),
+	)
 
-	opts := nacos.NewNacosConfig(rpcConfig.Name, rpcConfig.ListenOn, sc, cc)
+	opts := nacos.NewNacosConfig(rpcConfig.Name, rpcConfig.ListenOn, sc, &cc, nacos.WithGroup(nacosConfig.Group))
 	err := nacos.RegisterService(opts)
 	if err != nil {
 		log.Fatalf("register service failed: %s", err)
