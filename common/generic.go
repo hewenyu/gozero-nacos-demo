@@ -44,7 +44,7 @@ func MergeMap(dest, src map[interface{}]interface{}) map[interface{}]interface{}
 func MarshalObjectToYamlString(obj interface{}) (string, error) {
 	bs, err := yaml.Marshal(obj)
 	if err != nil {
-		return "", fmt.Errorf("marshal obj [%#v] faild, err: %v", obj, err)
+		return "", fmt.Errorf("marshal obj [%#v] faild, err: %w", obj, err)
 	}
 	return string(bs), nil
 }
