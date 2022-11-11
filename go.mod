@@ -11,7 +11,7 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-require github.com/hewenyu/zero-contrib/zrpc/registry/nacos v0.0.0-20221111025802-a481f9336c3f
+require github.com/hewenyu/zero-contrib/zrpc/registry/nacos v0.0.0-20221111100005-f967757e9ebc
 
 require (
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1704 // indirect
