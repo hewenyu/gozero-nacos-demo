@@ -11,6 +11,7 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	zeroConf "github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/zrpc"
 )
 
@@ -176,6 +177,32 @@ func MustRegister(nacosConfig *Nacos, rpcConfig *zrpc.RpcServerConf) {
 	)
 
 	opts := nacos.NewNacosConfig(rpcConfig.Name, rpcConfig.ListenOn, sc, &cc, nacos.WithGroup(nacosConfig.Group))
+	err := nacos.RegisterService(opts)
+	if err != nil {
+		log.Fatalf("register service failed: %s", err)
+	}
+}
+
+// MustRegister 注册
+func MustRegisterAPI(nacosConfig *Nacos, apiConfig *rest.RestConf) {
+
+	sc := []constant.ServerConfig{
+		*constant.NewServerConfig(nacosConfig.Addr, nacosConfig.Port, constant.WithContextPath("/nacos"), constant.WithGrpcPort(nacosConfig.GrpcPort)),
+	}
+
+	// create ClientConfig
+	cc := *constant.NewClientConfig(
+		constant.WithNamespaceId(nacosConfig.NamespaceID),
+		constant.WithTimeoutMs(5000),
+		constant.WithNotLoadCacheAtStart(true),
+		constant.WithLogDir("/tmp/nacos/log"),
+		constant.WithCacheDir("/tmp/nacos/cache"),
+		constant.WithUsername(nacosConfig.Username),
+		constant.WithPassword(nacosConfig.Password),
+		constant.WithLogLevel("info"),
+	)
+	listenOn := fmt.Sprintf("%v:%v", apiConfig.Host, apiConfig.Port)
+	opts := nacos.NewNacosConfig(apiConfig.Name, listenOn, sc, &cc, nacos.WithGroup(nacosConfig.Group))
 	err := nacos.RegisterService(opts)
 	if err != nil {
 		log.Fatalf("register service failed: %s", err)
